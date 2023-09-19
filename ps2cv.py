@@ -27,6 +27,14 @@ import numpy as np
 import argparse
 import matplotlib.pyplot as plt
 
+def get_lut_ind(input, min, max):
+    if input<=min:
+        return 0
+    elif input>=max:
+        return 255
+    else:
+        return int( ((input-min)/(max-min)) *255 )
+
 parser = argparse.ArgumentParser(description='Pseudo Color generation via OpenCV')
 parser.add_argument('-i', '--input', help='Path to input image.', default='x-ray.png')
 parser.add_argument('-t', '--type',help='Type of colormap.', type=int, default='2')
@@ -61,24 +69,27 @@ for i in range(min_val+1):
 for i in range(max_val+1):
     LUT[255-i] = [0,0,255]
 
-seg_len = int((max_val-min_val)/4)
+# seg_len = int((ma
+# x_val-min_val)/4)
+seg_len = int(256/4)
 print("Seg len " + str(seg_len))
 # BGR 
 # first quarter. Blue is max, green is increasing, red is 0
 for i in range(seg_len):
-    LUT[min_val + i] = [255, int(i*255/seg_len),0]
+    LUT[i] = [255, int(i*255/seg_len),0]
 
 # second quarter.  blue is decreasing, green is max, red is 0
 for i in range(seg_len):
-    LUT[seg_len + min_val + i] = [int(255 - (i*255/seg_len)),255, 0]
+    LUT[seg_len + i] = [int(255 - (i*255/seg_len)),255, 0]
 
 # third quarter. blue is 0, green is max,  red is increasing
 for i in range(seg_len):
-    LUT[seg_len+ seg_len+ min_val + i] = [0,255,int(i*255/seg_len)]
+    LUT[seg_len+ seg_len+ i] = [0,255,int(i*255/seg_len)]
 
 # fourth quarter.  blue is 0, green is decreasing. red is max
 for i in range(seg_len):
-    LUT[seg_len + seg_len + seg_len + min_val +i] = [0,int(255 - (i*255/seg_len)),255]
+    LUT[seg_len + seg_len + seg_len +i] = [0,int(255 - (i*255/seg_len)),255]
+
 
 
 # print(LUT)
@@ -87,13 +98,15 @@ correct_image = cv2.applyColorMap(image, args.type)
 new_image = np.zeros([image.shape[0], image.shape[1], 3], np.uint8)
 for i in range(image.shape[0]):
     for j in range(image.shape[1]):
-        # print(str(i) + ", " + str(j) + ": " + str(image[i,j]) + "->" + str(LUT[image[i,j]]))
-        new_image[i,j,:] = LUT[image[i,j]]
+        # print(str(i) + ", " + str(j) + ": " + str(image[i,j]) + "->" + str(get_lut_ind(image[i,j], min_val, max_val)) + str(LUT[get_lut_ind(image[i,j], min_val, max_val)]))
+        new_image[i,j,:] = LUT[get_lut_ind(image[i,j], min_val, max_val)]
 
 
-cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
+cv2.namedWindow("manual version", cv2.WINDOW_NORMAL)
 cv2.namedWindow("correct image", cv2.WINDOW_NORMAL)
-cv2.imshow("correct image", correct_image)
+cv2.namedWindow("original", cv2.WINDOW_NORMAL)
 
-cv2.imshow(window_name, new_image)
+cv2.imshow("correct image", correct_image)
+cv2.imshow("original", image)
+cv2.imshow("manual version", new_image)
 cv2.waitKey()
