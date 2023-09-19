@@ -84,15 +84,15 @@ for i in range(seg_len):
 # print(LUT)
 
 correct_image = cv2.applyColorMap(image, args.type)
-new_image = np.zeros([image.shape[0], image.shape[1], 3])
+new_image = np.zeros([image.shape[0], image.shape[1], 3], np.uint8)
 for i in range(image.shape[0]):
     for j in range(image.shape[1]):
+        # print(str(i) + ", " + str(j) + ": " + str(image[i,j]) + "->" + str(LUT[image[i,j]]))
         new_image[i,j,:] = LUT[image[i,j]]
 
 
 cv2.namedWindow(window_name, cv2.WINDOW_NORMAL)
-cv2.namedWindow("correct image", cv2.WIND
-                OW_NORMAL)
+cv2.namedWindow("correct image", cv2.WINDOW_NORMAL)
 cv2.imshow("correct image", correct_image)
 
 cv2.imshow(window_name, new_image)
