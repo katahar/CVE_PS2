@@ -25,7 +25,7 @@ Note to self: be sure to run "conda activate cve" before running this file
 import cv2
 import numpy as np
 import argparse
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 def get_lut_ind(input, min, max):
     if input<=min:
@@ -69,29 +69,12 @@ for i in range(min_val+1):
 for i in range(max_val+1):
     LUT[255-i] = [0,0,255]
 
-# seg_len = int((ma
-# x_val-min_val)/4)
+# seg_len = int((max_val-min_val)/4)
 seg_len = int(256/4)
 half_seg_len = int(seg_len/2)
-print("Seg len " + str(seg_len))
-# # BGR 
-# # first quarter. Blue is max, green is increasing, red is 0
-# for i in range(seg_len):
-#     LUT[i] = [255, int(i*255/seg_len),0]
+# print("Seg len " + str(seg_len))
 
-# # second quarter.  blue is decreasing, green is max, red is 0
-# for i in range(seg_len):
-#     LUT[seg_len + i] = [int(255 - (i*255/seg_len)),255, 0]
-
-# # third quarter. blue is 0, green is max,  red is increasing
-# for i in range(seg_len):
-#     LUT[seg_len+ seg_len+ i] = [0,255,int(i*255/seg_len)]
-
-# # fourth quarter.  blue is 0, green is decreasing. red is max
-# for i in range(seg_len):
-#     LUT[seg_len + seg_len + seg_len +i] = [0,int(255 - (i*255/seg_len)),255]
-
-
+#  Following Jet distribution, shown here: https://octave.sourceforge.io/octave/function/jet.html
 # BGR 
 # first half_section. Blue is increasing from half, green is 0, red is 0
 for i in range(half_seg_len):
@@ -121,6 +104,22 @@ for i in range(image.shape[0]):
     for j in range(image.shape[1]):
         # print(str(i) + ", " + str(j) + ": " + str(image[i,j]) + "->" + str(get_lut_ind(image[i,j], min_val, max_val)) + str(LUT[get_lut_ind(image[i,j], min_val, max_val)]))
         new_image[i,j,:] = LUT[get_lut_ind(image[i,j], min_val, max_val)]
+
+
+# locating highest intensity areas
+max_indices = np.where(image == max_val)
+center_of_grav = np.mean(max_indices, axis=1)
+print(center_of_grav)
+# drawing circle
+radius_in = 30
+thickness_in = 2
+color_in = (255,255,255)
+new_image = cv2.circle(new_image, [int(center_of_grav[0]),int(center_of_grav[1])], radius=radius_in, color=color_in, thickness=thickness_in*2)
+new_image = cv2.line(new_image, [int(center_of_grav[0]),int(center_of_grav[1]-(radius_in*1.5))], [int(center_of_grav[0]),int(center_of_grav[1]+(radius_in*1.5))], color=color_in, thickness=thickness_in) 
+new_image = cv2.line(new_image, [int(center_of_grav[0]-(radius_in*1.5)),int(center_of_grav[1])], [int(center_of_grav[0]+(radius_in*1.5)),int(center_of_grav[1])], color=color_in, thickness=thickness_in) 
+
+
+print(center_of_grav)
 
 
 cv2.namedWindow("manual version", cv2.WINDOW_NORMAL)
