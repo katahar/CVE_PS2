@@ -48,9 +48,10 @@ max_val = image[max_ind]
 min_ind = np.unravel_index(np.argmin(image, axis=None), image.shape)
 min_val = image[min_ind]
 
-print("Image shape")
-print(image[0,0].shape)
+# print("Image shape")
+# print(image[0,0].shape)
 
+print("Absolute values: ")
 print("max")
 print( (image[max_ind]))
 print(max_ind)
@@ -58,6 +59,15 @@ print(max_ind)
 print("min")
 print( (image[min_ind]))
 print(min_ind)
+
+print("Outlier removed values")
+temp_flat = np.ndarray.flatten(image)
+temp_st_dev = np.std(temp_flat)
+temp_mean = np.mean(temp_flat)
+print("mean " + str(temp_mean) + ", std: " + str(temp_st_dev))
+max_997 = temp_flat[(np.abs(temp_flat - (temp_mean + (3*temp_st_dev)))).argmin()]
+min_997 = temp_flat[(np.abs(temp_flat - (temp_mean - (3*temp_st_dev)))).argmin()]
+print("New max: " + str(max_997) + ", New min: " + str(min_997))
 
 LUT = np.zeros([256,3])
 
@@ -103,13 +113,18 @@ new_image = np.zeros([image.shape[0], image.shape[1], 3], np.uint8)
 for i in range(image.shape[0]):
     for j in range(image.shape[1]):
         # print(str(i) + ", " + str(j) + ": " + str(image[i,j]) + "->" + str(get_lut_ind(image[i,j], min_val, max_val)) + str(LUT[get_lut_ind(image[i,j], min_val, max_val)]))
-        new_image[i,j,:] = LUT[get_lut_ind(image[i,j], min_val, max_val)]
+        new_image[i,j,:] = LUT[get_lut_ind(image[i,j], min_997, max_997)]
 
 
 # locating highest intensity areas
-max_indices = np.where(image == max_val)
+# max_indices = np.where(image == max_val)
+max_indices = np.where(image == max_997)
+
 center_of_grav = np.mean(max_indices, axis=1)
-print(center_of_grav)
+# need to flip, unsure why?
+center_of_grav = [center_of_grav[1], center_of_grav[0]]
+
+
 # drawing circle
 radius_in = 30
 thickness_in = 2
