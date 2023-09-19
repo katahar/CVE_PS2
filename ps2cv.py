@@ -72,25 +72,46 @@ for i in range(max_val+1):
 # seg_len = int((ma
 # x_val-min_val)/4)
 seg_len = int(256/4)
+half_seg_len = int(seg_len/2)
 print("Seg len " + str(seg_len))
+# # BGR 
+# # first quarter. Blue is max, green is increasing, red is 0
+# for i in range(seg_len):
+#     LUT[i] = [255, int(i*255/seg_len),0]
+
+# # second quarter.  blue is decreasing, green is max, red is 0
+# for i in range(seg_len):
+#     LUT[seg_len + i] = [int(255 - (i*255/seg_len)),255, 0]
+
+# # third quarter. blue is 0, green is max,  red is increasing
+# for i in range(seg_len):
+#     LUT[seg_len+ seg_len+ i] = [0,255,int(i*255/seg_len)]
+
+# # fourth quarter.  blue is 0, green is decreasing. red is max
+# for i in range(seg_len):
+#     LUT[seg_len + seg_len + seg_len +i] = [0,int(255 - (i*255/seg_len)),255]
+
+
 # BGR 
-# first quarter. Blue is max, green is increasing, red is 0
+# first half_section. Blue is increasing from half, green is 0, red is 0
+for i in range(half_seg_len):
+    LUT[i] = [int(255/2) +int(i*255/seg_len), 0,0]
+
+# first full section. Blue is max, green is increasing, red is 0
 for i in range(seg_len):
-    LUT[i] = [255, int(i*255/seg_len),0]
+    LUT[half_seg_len + i] = [255, int(i*255/seg_len),0]
 
-# second quarter.  blue is decreasing, green is max, red is 0
+# second full section.  blue is decreasing, green is max, red is increasing
 for i in range(seg_len):
-    LUT[seg_len + i] = [int(255 - (i*255/seg_len)),255, 0]
+    LUT[half_seg_len + seg_len + i] = [int(255 - (i*255/seg_len)),255, int(i*255/seg_len)]
 
-# third quarter. blue is 0, green is max,  red is increasing
+# third full section.  blue is 0, green is decreasing, red is max
 for i in range(seg_len):
-    LUT[seg_len+ seg_len+ i] = [0,255,int(i*255/seg_len)]
+    LUT[half_seg_len + seg_len + seg_len + i] = [0,int(255 - (i*255/seg_len)), 255]
 
-# fourth quarter.  blue is 0, green is decreasing. red is max
-for i in range(seg_len):
-    LUT[seg_len + seg_len + seg_len +i] = [0,int(255 - (i*255/seg_len)),255]
-
-
+# last  half section.  blue is 0, green is 0, red is decreasing
+for i in range(half_seg_len):
+    LUT[half_seg_len + seg_len + seg_len + seg_len + i] = [0,0, int(255 - (i*255/seg_len))]
 
 # print(LUT)
 
